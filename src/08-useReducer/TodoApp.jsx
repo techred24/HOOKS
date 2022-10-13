@@ -16,6 +16,9 @@ const initialState = [
 
 export const TodoApp = () => {
     const [todos, dispatch] = useReducer( todoReducer, initialState );
+    const handleNewTodo = ( todo ) => {
+        console.log({ todo });
+    }
   return (
     <>
         <h1>TodoApp: 10, <small>pendientes: 2</small></h1>
@@ -23,6 +26,8 @@ export const TodoApp = () => {
 
         <div className="row">
             <div className="col-7">
+
+                {/* TodoList */}
                 <ul className='list-group'>
                     {
                         todos.map( todo => (
@@ -33,12 +38,14 @@ export const TodoApp = () => {
                         ))
                     }
                 </ul>
+                {/* TodoList */}
             </div>
 
             <div className="col-5">
                 <h4>Agregar TODO </h4>
                 <hr />
 
+                {/* TodoAdd onNewTodo { todo } */}
                 <form>
                     <input
                     type="text"
@@ -52,6 +59,7 @@ export const TodoApp = () => {
                         Agregar
                     </button>
                 </form>
+                {/* Fin TodoAdd */}
             </div>
         </div>
     </>
