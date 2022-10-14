@@ -6,7 +6,7 @@ const init = () => {
 }
 export const useTodo = () => {
     const [ todos, dispatch ] = useReducer(todoReducer, [], init );
-
+    
     useEffect(() => {
         if (JSON.stringify(todos) === localStorage.getItem('todos')) return
         localStorage.setItem('todos', JSON.stringify(todos))
@@ -37,6 +37,9 @@ export const useTodo = () => {
         todos,
         handleNewTodo,
         handleDeleteTodo,
-        handleToggleTodo
+        handleToggleTodo,
+        todosCount: todos.length,
+        pendingTodosCount: todos.filter(todo => !todo.done).length
+
   };
 }
