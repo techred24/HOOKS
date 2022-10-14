@@ -1,30 +1,53 @@
-import React, { useReducer } from 'react'
+import React, { useEffect, useReducer } from 'react'
 import { TodoAdd } from './TodoAdd';
 import { TodoList } from './TodoList';
 import { todoReducer } from './todoReducer';
 
 const initialState = [
-    {
-        id: new Date().getTime(),
-        description: 'Coding',
-        done: false
-    },
-    {
-        id: new Date().getTime() * 3,
-        description: 'Reading',
-        done: false
-    }
+    // {
+    //     id: new Date().getTime(),
+    //     description: 'Coding',
+    //     done: false
+    // },
 ]
 
+const init = () => {
+    return JSON.parse( localStorage.getItem('todos') ) || [];
+}
+
 export const TodoApp = () => {
-    const [todos, dispatch] = useReducer( todoReducer, initialState );
+
+    // useTodo,
+    // this should expose todos, handleDeleteTodo, handleToggleTodo, handleNewTodo
+
+    const [todos, dispatch] = useReducer( todoReducer, initialState, init );
+
+    useEffect(() => {
+        if (JSON.stringify(todos) === localStorage.getItem('todos')) return
+        // console.log('Reaching here just by adding a new item')
+        localStorage.setItem('todos', JSON.stringify(todos))
+    }, [todos]);
+
     const handleNewTodo = ( todo ) => {
         const action = {
             type: '[TODO] Add Todo',
             payload: todo
         }
         dispatch( action );
-        console.log({ todo });
+        // console.log({ todo });
+    }
+
+    const handleDeleteTodo = ( id ) => {
+        dispatch({
+            type: '[TODO] Remove Todo',
+            payload: id
+        });
+    }
+    const handleToggleTodo = ( id ) => {
+        dispatch({
+            type: '[TODO] Toggle Todo',
+            payload: id
+        });
     }
   return (
     <>
@@ -35,7 +58,7 @@ export const TodoApp = () => {
             <div className="col-7">
 
                 {/* TodoList */}
-                    <TodoList todos={todos}/>
+                    <TodoList todos={todos} onDeleteTodo={ handleDeleteTodo } onToggleTodo={ handleToggleTodo } />
                 {/* TodoList */}
             </div>
 
