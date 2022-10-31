@@ -1,10 +1,34 @@
 import React from "react"
-import { render, screen } from "@testing-library/react"
+import { fireEvent, render, screen } from "@testing-library/react"
 import { MultipleCustomHooks } from "../../src/03-examples"
+import { useFetch } from '../../src/hooks/useFetch'
+import { useCounter } from "../../src/hooks/useCounter";
 
+jest.mock('../../src/hooks/useFetch');
+jest.mock('../../src/hooks/useCounter');
 
 describe('Tests on <MultipleCustomHooks />', () => {
+
+    const mockIncrement = jest.fn();
+        
+    useCounter.mockReturnValue({
+        counter: 1,
+        increment: mockIncrement
+    });
+
+    // If mockIncrement has been called in a test, useCounter needs to be reseted in each test
+    beforeEach( () => {
+        jest.clearAllMocks();
+    });
+
     test('It must show the default component', () => {
+
+        useFetch.mockReturnValue({
+            data: null,
+            isLoading: true,
+            hasError: null
+        })
+
         render(<MultipleCustomHooks/>);
         expect( screen.getByText('Loading...') );
         expect( screen.getByText('BreakingBad Quotes') );
@@ -12,5 +36,34 @@ describe('Tests on <MultipleCustomHooks />', () => {
         const nextButton = screen.getByRole('button', {name: 'Next quote'});
         expect(nextButton.disabled).toBeTruthy();
         screen.debug();
+    });
+
+    test('It must show a Quote', () => {
+        useFetch.mockReturnValue({
+            data: [{ author: 'Rafael', quote: 'Eso es hacia mí' }],
+            isLoading: false,
+            hasError: null
+        });
+        render( <MultipleCustomHooks />);
+        expect( screen.getByText('Eso es hacia mí') ).toBeTruthy();
+        expect( screen.getByText('Rafael') ).toBeTruthy();
+
+        const nextButton = screen.getByRole('button', { name: 'Next quote' });
+        expect(nextButton.disabled).toBeFalsy();
+    });
+
+    test('It must call the function increment', () => {
+
+        useFetch.mockReturnValue({
+            data: [{ author: 'Rafael', quote: 'Eso es hacia mí' }],
+            isLoading: false,
+            hasError: null
+        });
+
+        render( <MultipleCustomHooks />);
+        const nextButton = screen.getByRole('button', { name: 'Next quote' });
+        fireEvent.click( nextButton );
+
+        expect( mockIncrement ).toHaveBeenCalled();
     });
 });
